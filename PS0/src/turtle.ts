@@ -12,7 +12,9 @@ export type Color =
   | "purple"
   | "orange"
   | "cyan"
-  | "magenta";
+  | "magenta"
+  | "brown"
+  | "teal";
 
 export interface Turtle {
   forward(units: number): void;

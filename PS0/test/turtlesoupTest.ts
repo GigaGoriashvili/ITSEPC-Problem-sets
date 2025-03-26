@@ -71,16 +71,25 @@ describe("drawApproximateCircle", () => {
 
 describe("findPath", () => {
   it("example path finding (conceptual check)", () => {
-    const turtle = new SimpleTurtle();
-    const points: Point[] = [
-      { x: 10, y: 10 },
-      { x: 40, y: 10 },
-      { x: 40, y: 40 },
-    ];
-    const pathInstructions = findPath(turtle, points);
-    // Since findPath is conceptual in PS0, you might just check if it returns *something*
-    expect(pathInstructions).to.be.an("array");
-    // More detailed tests would involve analyzing the *content* of pathInstructions if you define a specific output format.
+      const turtle = new SimpleTurtle();
+      const points: Point[] = [
+          { x: 10, y: 10 },
+          { x: 40, y: 10 },
+          { x: 40, y: 40 },
+      ];
+      const pathInstructions = findPath(turtle, points);
+      
+      // Basic check from original test
+      expect(pathInstructions).to.be.an("array");
+      
+      // More specific checks
+      expect(pathInstructions).to.have.length(6); // 3 turns + 3 forwards
+      expect(pathInstructions[0]).to.equal("turn -45.00"); // Initial turn to 45° from vertical
+      expect(pathInstructions[1]).to.equal("forward 14.14"); // Diagonal move
+      expect(pathInstructions[2]).to.equal("turn -45.00"); // Turn to horizontal
+      expect(pathInstructions[3]).to.equal("forward 30.00"); // Horizontal move
+      expect(pathInstructions[4]).to.equal("turn 90.00"); // Turn to vertical
+      expect(pathInstructions[5]).to.equal("forward 30.00"); // Vertical move
   });
 });
 

@@ -8,16 +8,14 @@ import { execSync } from "child_process";
  * @param sideLength The length of each side of the square in pixels.
  */
 export function drawSquare(turtle: Turtle, sideLength: number): void {
-  // TODO: Implement drawSquare
-  // Example (incorrect square, just to show usage):
   turtle.forward(sideLength);
   turtle.turn(90);
   turtle.forward(sideLength);
-  turtle.turn(180);
+  turtle.turn(90);
   turtle.forward(sideLength);
   turtle.turn(90);
   turtle.forward(sideLength);
-  turtle.turn(400);
+  turtle.turn(90);
 }
 
 /**
@@ -28,8 +26,8 @@ export function drawSquare(turtle: Turtle, sideLength: number): void {
  * @returns The length of the chord.
  */
 export function chordLength(radius: number, angleInDegrees: number): number {
-  // TODO: Implement chordLength
-  return 0; // Placeholder - replace with your implementation
+  const angleInRadians = (angleInDegrees * Math.PI) / 180;
+  return Number((2 * radius * Math.sin(angleInRadians / 2)).toFixed(10));
 }
 
 /**
@@ -44,7 +42,14 @@ export function drawApproximateCircle(
   radius: number,
   numSides: number
 ): void {
-  // TODO: Implement drawApproximateCircle
+    const angle = 360 / numSides;
+    
+    const sideLength = chordLength(radius, angle);
+    
+    for (let i = 0; i < numSides; i++) {
+        turtle.forward(sideLength);
+        turtle.turn(angle);
+    }
 }
 
 /**
@@ -54,8 +59,9 @@ export function drawApproximateCircle(
  * @returns The distance between p1 and p2.
  */
 export function distance(p1: Point, p2: Point): number {
-  // TODO: Implement distance
-  return 0; // Placeholder
+  const dx = p2.x - p1.x;  // Difference in x coordinates
+  const dy = p2.y - p1.y;  // Difference in y coordinates
+  return Math.sqrt(dx * dx + dy * dy);  // Square root of sum of squares
 }
 
 /**
@@ -67,9 +73,43 @@ export function distance(p1: Point, p2: Point): number {
  *          This is simplified for Problem Set 0 and we won't actually use these instructions to drive the turtle directly in this starter code.
  *          The function primarily needs to *calculate* the path conceptually.
  */
-export function findPath(turtle: Turtle, points: Point[]): string[] {
-  // TODO: Implement findPath (conceptually, you don't need to *execute* the path here)
-  return []; // Placeholder
+export function findPath(turtle: SimpleTurtle, points: Point[]): string[] {
+  const instructions: string[] = [];
+  
+  if (points.length < 2) {
+      return instructions;
+  }
+
+  let currentX = turtle['x'];
+  let currentY = turtle['y'];
+  let currentHeading = turtle['headingDegrees'];
+  
+  for (let i = 0; i < points.length; i++) {
+      const next = points[i];
+      const dist = distance({x: currentX, y: currentY}, next);
+      
+      if (dist < 0.0001) continue;
+      
+      const dx = next.x - currentX;
+      const dy = next.y - currentY;
+      const angleToNext = Math.atan2(dy, dx) * 180 / Math.PI;
+      const targetHeading = angleToNext - 90;
+      let turnAngle = targetHeading - currentHeading;
+      
+      while (turnAngle > 180) turnAngle -= 360;
+      while (turnAngle <= -180) turnAngle += 360;
+      
+      if (Math.abs(turnAngle) > 0.0001) {
+          instructions.push(`turn ${turnAngle.toFixed(2)}`);
+          currentHeading += turnAngle;
+      }
+      
+      instructions.push(`forward ${dist.toFixed(2)}`);
+      currentX = next.x;
+      currentY = next.y;
+  }
+  
+  return instructions;
 }
 
 /**
@@ -80,10 +120,28 @@ export function findPath(turtle: Turtle, points: Point[]): string[] {
  * @param turtle The turtle to use.
  */
 export function drawPersonalArt(turtle: Turtle): void {
-  // TODO: Implement drawPersonalArt
-  // Example - replace with your own art!
+  turtle.turn(-45);
+  turtle.forward(28);
+
+  turtle.turn(45);
+  turtle.forward(40);
+  turtle.turn(90);
+  turtle.forward(60);
+  turtle.turn(90);
+  turtle.forward(40);
+  turtle.turn(90);
+  turtle.forward(60);
+
+  turtle.turn(63);
+  turtle.forward(67);
+  turtle.turn(-97);
+  turtle.forward(36);
+
+  turtle.turn(130);
+  turtle.forward(100);
+
   for (let i = 0; i < 6; i++) {
-    turtle.forward(50);
+    turtle.forward(10);
     turtle.turn(60);
   }
 }
@@ -156,7 +214,7 @@ export function main(): void {
   // Example Usage - Uncomment functions as you implement them
 
   // Draw a square
-  drawSquare(turtle, 100);
+  // drawSquare(turtle, 100);
 
   // Example chordLength calculation (for testing in console)
   // console.log("Chord length for radius 5, angle 60 degrees:", chordLength(5, 60));
@@ -175,7 +233,7 @@ export function main(): void {
   // console.log("Path instructions:", pathInstructions);
 
   // Draw personal art
-  // drawPersonalArt(turtle);
+  drawPersonalArt(turtle);
 
   const htmlContent = generateHTML((turtle as SimpleTurtle).getPath()); // Cast to access getPath
   saveHTMLToFile(htmlContent);
